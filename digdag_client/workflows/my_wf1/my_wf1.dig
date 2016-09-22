@@ -1,0 +1,4 @@
+timezone: Asia/Tokyo
+
++query:
+  sh>: echo 'hello, world'

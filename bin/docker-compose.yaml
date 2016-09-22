@@ -1,0 +1,40 @@
+version: '2'
+
+services:
+  digdag_server:
+    container_name: digdag_server
+    build: $DIGDAG_SERVER_DOCKERFILE_DIR
+    environment:
+      DIGDAGDB_USER: $DIGDAGDB_USER
+      DIGDAGDB_PASS: $DIGDAGDB_PASS
+      DIGDAGDB_HOST: $DIGDAGDB_HOST
+      DIGDAGDB_PORT: $DIGDAGDB_PORT
+      DIGDAGDB_DATABASE: $DIGDAGDB_DATABASE
+    ports:
+      - "65432:65432"
+    depends_on:
+      - digdag_db
+
+  digdag_client:
+    container_name: digdag_client
+    build: $DIGDAG_CLIENT_DOCKERFILE_DIR
+    volumes:
+      - ${DIGDAG_CLIENT_WORKFLOW_DIR}:/var/digdag/workflows
+    depends_on:
+      - digdag_server
+
+  digdag_db:
+    container_name: digdag_db
+    build: $DB_BUILD_DOCKERFILE_DIR
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DIGDAGDB_USER: $DIGDAGDB_USER
+      DIGDAGDB_PASS: $DIGDAGDB_PASS
+      DIGDAGDB_HOST: $DIGDAGDB_HOST
+      DIGDAGDB_PORT: $DIGDAGDB_PORT
+      DIGDAGDB_DATABASE: $DIGDAGDB_DATABASE
+    ports:
+      - "5432:5432"
+    volumes_from:
+      - container:digdag_data_container
